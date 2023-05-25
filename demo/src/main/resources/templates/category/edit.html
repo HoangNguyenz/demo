@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Edit Category</title>
+</head>
+<body>
+<h1>Edit Category</h1>
+
+<form action="/categories/edit/{id}(id=${category.id})" method="post" th:object="${category}">
+  <input type="hidden" name="_method" value="post" />
+
+  <div>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" th:field="*{name}" />
+  </div>
+
+  <div>
+    <button type="submit">Update</button>
+  </div>
+</form>
+</body>
+</html>
