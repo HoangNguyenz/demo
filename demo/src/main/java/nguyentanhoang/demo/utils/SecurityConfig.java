@@ -1,5 +1,6 @@
 package nguyentanhoang.demo.utils;
 
+import nguyentanhoang.demo.services.CustomUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,65 +16,43 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailService();
+    public UserDetailsService userDetailsService() { return new CustomUserDetailService();
     }
-
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder();
     }
-
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
-        auth.setUserDetailsService(userDetailsService());
-        auth.setPasswordEncoder(passwordEncoder());
+    public DaoAuthenticationProvider authenticationProvider() { DaoAuthenticationProvider auth = new DaoAuthenticationProvider(); auth.setUserDetailsService(userDetailsService()); auth.setPasswordEncoder(passwordEncoder());
         return auth;
     }
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
-            Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/", "/register",
-                                "/error")
+                        .requestMatchers( "/css/**", "/js/**", "/", "/register", "/error")
                         .permitAll()
-
-                        .requestMatchers("/books/edit", "/books/delete")
-
-                        .authenticated()
-
+                        .requestMatchers( "/books/edit", "/books/delete")
+                        .hasAuthority("ADMIN")
                         .requestMatchers("/books", "/books/add")
-
-                        .authenticated()
-
+                        .hasAnyAuthority("ADMIN","USER")
                         .anyRequest().authenticated()
-
                 )
                 .logout(logout -> logout.logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
-
                         .permitAll()
-
                 )
                 .formLogin(formLogin -> formLogin.loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/")
-
                         .permitAll()
-
                 )
                 .rememberMe(rememberMe -> rememberMe.key("uniqueAndSecret")
-                        .tokenValiditySeconds(86400)
-                        .userDetailsService(userDetailsService())
+                        .tokenValiditySeconds(86400) .userDetailsService(userDetailsService())
                 )
                 .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.accessDeniedPage("/403"))
-                .build();
+                        exceptionHandling.accessDeniedPage("/403")) .build();
     }
 }
