@@ -37,8 +37,6 @@ public class BookController {
     }
 
 
-
-
     @GetMapping("/edit/{id}")
     public String editBookForm(@PathVariable("id") Long id, Model model) {
         Book book = bookService.getBookById(id);
@@ -74,6 +72,18 @@ public class BookController {
     @GetMapping("/delete/{id}")
     public String deleteBook(@PathVariable("id") Long id) {
         bookService.deleteBook(id);
+        return "redirect:/books";
+    }
+
+    @PostMapping("/add")
+    public String addBook(@Valid @ModelAttribute("book") Book book, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // Nếu có lỗi trong quá trình binding dữ liệu vào đối tượng Book, xử lý lỗi tại đây
+            return "book/add";
+        }
+
+        // Xử lý logic thêm sách vào cơ sở dữ liệu
+        bookService.addBook(book);
         return "redirect:/books";
     }
 
